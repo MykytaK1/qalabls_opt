@@ -3,22 +3,22 @@
 <suite name="second_lab" verbose="1">
     <test name="1. Send email test">
         <classes>
-            <class name="com.lnu.qa.secondlab.mail.yahoo.tests.SendMessageTest"/>
+            <class name="com.lnu.qa.thirdlab.mail.yahoo.tests.SendMessageTest"/>
         </classes>
     </test>
     <test name="2. Draft email test">
         <classes>
-            <class name="com.lnu.qa.secondlab.mail.yahoo.tests.DraftMessageTest"/>
+            <class name="com.lnu.qa.thirdlab.mail.yahoo.tests.DraftMessageTest"/>
         </classes>
     </test>
     <test name="3. Star and delete email test">
         <classes>
-            <class name="com.lnu.qa.secondlab.mail.yahoo.tests.StarAndDeleteMessageTest"/>
+            <class name="com.lnu.qa.thirdlab.mail.yahoo.tests.StarAndDeleteMessageTest"/>
         </classes>
     </test>
     <test name="4. Incorrect receiver test">
         <classes>
-            <class name="com.lnu.qa.secondlab.mail.yahoo.tests.IncorrectReceiverTest"/>
+            <class name="com.lnu.qa.thirdlab.mail.yahoo.tests.IncorrectReceiverTest"/>
         </classes>
     </test>
 </suite>
