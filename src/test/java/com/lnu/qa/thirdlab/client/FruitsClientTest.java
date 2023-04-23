@@ -21,10 +21,6 @@ public class FruitsClientTest {
 
     private FruitsPort fruitsService;
 
-    private static String getUUID() {
-        return UUID.randomUUID().toString();
-    }
-
     @BeforeClass
     public void setUp() {
         log.info("Current thread: {}", Thread.currentThread().getName());
@@ -38,6 +34,10 @@ public class FruitsClientTest {
         fruitsService.removeAllFruits(new RemoveAllFruitsRequest());
     }
 
+    private static String getUUID() {
+        return UUID.randomUUID().toString();
+    }
+
     @Test
     public void shouldReturnEmptyListWhenNoFruitsAvailable() {
         log.info("Run test: shouldReturnEmptyListWhenNoFruitsAvailable");
@@ -48,16 +48,6 @@ public class FruitsClientTest {
         return fruitsService.getFruits(new GetFruitsRequest()).getFruits();
     }
 
-    @DataProvider(name = "fruits-name-provider")
-    private Object[][] fruitNameDataProvider() {
-        return new Object[][]{
-                {getUUID()},
-                {getUUID()},
-                {getUUID()},
-                {getUUID()},
-        };
-    }
-
     @DataProvider(name = "fruits-names-provider")
     private Object[][] fruitNamesDataProvider() {
         return new Object[][]{
@@ -65,6 +55,16 @@ public class FruitsClientTest {
                 {getUUID(), getUUID()},
                 {getUUID(), getUUID()},
                 {getUUID(), getUUID()},
+        };
+    }
+
+    @DataProvider(name = "fruits-name-provider")
+    private Object[][] fruitNameDataProvider() {
+        return new Object[][]{
+                {getUUID()},
+                {getUUID()},
+                {getUUID()},
+                {getUUID()},
         };
     }
 
@@ -80,7 +80,9 @@ public class FruitsClientTest {
         softAssert.assertTrue(savedFruit.getId().length() > 0);
         softAssert.assertEquals(savedFruit.getName(), fruitName);
 
-        List<Fruit> foundFruitsByName = getFruits().stream().filter(fr -> fr.getName().equals(fruitName)).collect(Collectors.toList());
+        List<Fruit> foundFruitsByName = getFruits().stream()
+                .filter(fr -> fr.getName().equals(fruitName))
+                .collect(Collectors.toList());
         softAssert.assertEquals(foundFruitsByName.get(0).getId(), savedFruit.getId());
         softAssert.assertAll();
     }
