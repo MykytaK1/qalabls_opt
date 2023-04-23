@@ -1,23 +1,23 @@
 package com.lnu.qa.thirdlab.client;
 
-import com.google.common.collect.Sets;
 import com.lnu.qa.thirdlab.generated.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
+import org.testng.collections.Sets;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class FruitsClientTest extends AbstractTestNGSpringContextTests {
+public class FruitsClientTest {
 
     private FruitsPort fruitsService;
 
@@ -34,11 +34,13 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
 
     @AfterMethod
     public void tearDown() {
+        log.info("Clean test fruits");
         fruitsService.removeAllFruits(new RemoveAllFruitsRequest());
     }
 
     @Test
     public void shouldReturnEmptyListWhenNoFruitsAvailable() {
+        log.info("Run test: shouldReturnEmptyListWhenNoFruitsAvailable");
         Assert.assertEquals(getFruits().size(), 0);
     }
 
@@ -46,8 +48,8 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
         return fruitsService.getFruits(new GetFruitsRequest()).getFruits();
     }
 
-    @DataProvider(name = "fruits-data-provider")
-    public Object[][] dpMethod() {
+    @DataProvider(name = "fruits-name-provider")
+    private Object[][] fruitNameDataProvider() {
         return new Object[][]{
                 {getUUID()},
                 {getUUID()},
@@ -56,8 +58,19 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
         };
     }
 
-    @Test(dataProvider = "fruits-data-provider")
+    @DataProvider(name = "fruits-names-provider")
+    private Object[][] fruitNamesDataProvider() {
+        return new Object[][]{
+                {getUUID(), getUUID()},
+                {getUUID(), getUUID()},
+                {getUUID(), getUUID()},
+                {getUUID(), getUUID()},
+        };
+    }
+
+    @Test(dataProvider = "fruits-name-provider")
     public void shouldSaveFruit(String fruitName) {
+        log.info("Run test: shouldSaveFruit, name: {}", fruitName);
         //Given
         CreateFruitRequest createFruitRequest = buildCreateFruitRequest(fruitName);
         //When
@@ -72,11 +85,41 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
         softAssert.assertAll();
     }
 
-    @Test
-    public void shouldGetFruitById() {
+    @Test(dataProvider = "fruits-names-provider")
+    public void shouldUpdateFruit(String[] fruitNames) {
+        log.info("Run test: shouldUpdateFruit, names: {}", Arrays.toString(fruitNames));
         //Given
-        String name = getUUID();
-        CreateFruitRequest createFruitRequest = buildCreateFruitRequest(name);
+        String name_1 = fruitNames[0];
+        String name_2 = fruitNames[1];
+        CreateFruitRequest createFruitRequest = buildCreateFruitRequest(name_1);
+        //When
+        Fruit savedFruit = fruitsService.createFruit(createFruitRequest).getFruit();
+        //Then
+        SoftAssert softAssert = new SoftAssert();
+        GetFruitRequest getFruitRequest = new GetFruitRequest();
+        getFruitRequest.setId(savedFruit.getId());
+        Fruit fruitById = fruitsService.getFruit(getFruitRequest).getFruit();
+
+        softAssert.assertEquals(fruitById.getName(), name_1);
+        fruitById.setName(name_2);
+
+        UpdateFruitRequest updateFruitRequest = new UpdateFruitRequest();
+        updateFruitRequest.setFruit(fruitById);
+        fruitsService.updateFruit(updateFruitRequest);
+
+        GetFruitRequest getFruitRequest_2 = new GetFruitRequest();
+        getFruitRequest_2.setId(savedFruit.getId());
+        Fruit fruitById_2 = fruitsService.getFruit(getFruitRequest_2).getFruit();
+        softAssert.assertEquals(fruitById_2.getName(), name_2);
+        softAssert.assertEquals(fruitsService.getFruits(new GetFruitsRequest()).getFruits().size(), 1);
+        softAssert.assertAll();
+    }
+
+    @Test(dataProvider = "fruits-name-provider")
+    public void shouldGetFruitById(String fruitName) {
+        log.info("Run test: shouldGetFruitById, name: {}", fruitName);
+        //Given
+        CreateFruitRequest createFruitRequest = buildCreateFruitRequest(fruitName);
         Fruit savedFruit = fruitsService.createFruit(createFruitRequest).getFruit();
         //When
         GetFruitRequest getFruitRequest = new GetFruitRequest();
@@ -86,11 +129,12 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(fruitById.getName(), savedFruit.getName());
     }
 
-    @Test
-    public void shouldRetrieveAllFruits() {
+    @Test(dataProvider = "fruits-names-provider")
+    public void shouldRetrieveAllFruits(String[] fruitNames) {
+        log.info("Run test: shouldRetrieveAllFruits, names: {}", Arrays.toString(fruitNames));
         //Given
-        String name_1 = getUUID();
-        String name_2 = getUUID();
+        String name_1 = fruitNames[0];
+        String name_2 = fruitNames[1];
         //When
         fruitsService.createFruit(buildCreateFruitRequest(name_1));
         fruitsService.createFruit(buildCreateFruitRequest(name_2));
@@ -103,10 +147,10 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
     }
 
 
-    @Test
-    public void shouldRemoveFruitById() {
+    @Test(dataProvider = "fruits-name-provider")
+    public void shouldRemoveFruitById(String fruitName) {
+        log.info("Run test: shouldRemoveFruitById, name: {}", fruitName);
         //Given
-        String fruitName = getUUID();
         Fruit savedFruit = fruitsService.createFruit(buildCreateFruitRequest(fruitName)).getFruit();
         //When
         RemoveFruitRequest removeFruitRequest = new RemoveFruitRequest();
@@ -119,9 +163,10 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
         softAssert.assertFalse(foundFruitsByName.isPresent());
         softAssert.assertAll();
     }
-//
+
     @Test
     public void shouldThrowExceptionWhenAttemptToSaveFruitWithId() {
+        log.info("Run test: shouldThrowExceptionWhenAttemptToSaveFruitWithId");
         //Given
         Fruit fruit = new Fruit();
         fruit.setName(getUUID());
@@ -134,6 +179,7 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void shouldReturnNullIfFruitNotFoundById() {
+        log.info("Run test: shouldReturnNullIfFruitNotFoundById");
         //Given
         GetFruitRequest getFruitRequest = new GetFruitRequest();
         getFruitRequest.setId("id");
@@ -145,6 +191,7 @@ public class FruitsClientTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void shouldReturnNullIfFruitNotFoundToRemoveById() {
+        log.info("Run test: shouldReturnNullIfFruitNotFoundToRemoveById");
         //Given
         RemoveFruitRequest removeFruitRequest = new RemoveFruitRequest();
         removeFruitRequest.setId("id");

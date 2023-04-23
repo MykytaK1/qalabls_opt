@@ -1,24 +1,9 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
 
-<suite name="second_lab" verbose="1">
-    <test name="1. Send email test">
+<suite name="third_lab" verbose="1">
+    <test name="Fruits test">
         <classes>
-            <class name="com.lnu.qa.thirdlab.mail.yahoo.tests.SendMessageTest"/>
-        </classes>
-    </test>
-    <test name="2. Draft email test">
-        <classes>
-            <class name="com.lnu.qa.thirdlab.mail.yahoo.tests.DraftMessageTest"/>
-        </classes>
-    </test>
-    <test name="3. Star and delete email test">
-        <classes>
-            <class name="com.lnu.qa.thirdlab.mail.yahoo.tests.StarAndDeleteMessageTest"/>
-        </classes>
-    </test>
-    <test name="4. Incorrect receiver test">
-        <classes>
-            <class name="com.lnu.qa.thirdlab.mail.yahoo.tests.IncorrectReceiverTest"/>
+            <class name="com.lnu.qa.thirdlab.client.FruitsClientTest"/>
         </classes>
     </test>
 </suite>
